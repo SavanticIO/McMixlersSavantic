@@ -62,7 +62,7 @@ jobs:
 
       - name: Rsync published files to server
         run: |
-          sudo rsync -az --delete -e "ssh -p ${SSH_PORT}" \
+          rsync -az --delete -e "ssh -p ${SSH_PORT}" \
             "${PUBLISH_DIR}/" \
             "${SSH_USER}@${SSH_HOST}:${{ steps.vars.outputs.release }}/"
 
