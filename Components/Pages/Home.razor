@@ -7,7 +7,7 @@
     </MudItem>
 
     <MudItem xs="12" md="8">
-        <MudCarousel Class="mud-width-full" Style="height: 1080px;" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+        <MudCarousel Class="mud-width-full" Style="height: 1080px;" ShowArrows="true" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="object">
             <MudCarouselItem Transition="@Transition.Slide">
                 <div class="d-flex justify-center align-center" style="height:100%">
                     <MudImage Fluid="true" Src="images/2025-09-26_19.19.26.png" Elevation="25" Class="rounded-lg" />
@@ -40,5 +40,22 @@
                 </div>
             </MudCarouselItem>
         </MudCarousel>
+    </MudItem>
+</MudGrid>
+
+<MudGrid Class="mt-6">
+    <MudItem xs="12">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h5" GutterBottom="true">How to join the Minecraft server (All The Mods 10)</MudText>
+            <MudList T="string" Dense="true">
+                <MudListItem T="string">Install Prism Launcher, CurseForge, or ATLauncher.</MudListItem>
+                <MudListItem T="string">Search for “All The Mods 10” and install version 4.11.</MudListItem>
+                <MudListItem T="string">Allocate at least 6–8 GB RAM to the modpack in your launcher settings.</MudListItem>
+                <MudListItem T="string">Launch the modpack once to complete initial setup and downloads.</MudListItem>
+                <MudListItem T="string">In Multiplayer, click Add Server and use Address: mcmixlers.savantic.dev</MudListItem>
+                <MudListItem T="string">Join the server. If mods mismatch, update/downgrade ATM10 to the server’s version.</MudListItem>
+                <MudListItem T="string">Optional: Install FTB Chunks/Utilities minimap configs if prompted, then relaunch and rejoin.</MudListItem>
+            </MudList>
+        </MudPaper>
     </MudItem>
 </MudGrid>
