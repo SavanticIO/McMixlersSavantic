@@ -32,8 +32,8 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
           cache: true
 
-      - name: Restore
-        run: dotnet restore "${PROJECT_PATH}"
+      - name: Restore (locked)
+        run: dotnet restore "${PROJECT_PATH}" --locked-mode
 
       - name: Publish (Release)
         run: dotnet publish "${PROJECT_PATH}" -c Release -o "${PUBLISH_DIR}"
