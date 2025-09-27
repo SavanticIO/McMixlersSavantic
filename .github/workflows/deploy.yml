@@ -71,10 +71,11 @@ jobs:
         run: |
           ssh -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" bash -lc '
             set -e
-            sudo chown -R www-data:www-data "${{ steps.vars.outputs.release }}"
-            sudo ln -sfn "${{ steps.vars.outputs.release }}" "${REMOTE_DIR}/current"
-            sudo systemctl restart "${SERVICE_NAME}"
-            sudo systemctl status "${SERVICE_NAME}" --no-pager -l || true
+            RELEASE="${{ steps.vars.outputs.release }}"
+            sudo chown -R www-data:www-data "$RELEASE"
+            sudo ln -sfn "$RELEASE" "${{ env.REMOTE_DIR }}/current"
+            sudo systemctl restart "${{ env.SERVICE_NAME }}"
+            sudo systemctl status "${{ env.SERVICE_NAME }}" --no-pager -l || true
           '
 
       - name: Prune old releases (keep last 5)
