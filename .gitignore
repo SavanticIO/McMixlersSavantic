@@ -229,6 +229,3 @@ AppPackages/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-
-# Don't commit images to version control
-/images/*
