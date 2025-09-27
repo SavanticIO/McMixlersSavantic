@@ -1,0 +1,175 @@
+﻿@using MineStatLib
+@implements IDisposable
+
+<div class="d-flex justify-center align-center" style="height:100%;">
+    <MudCard Class="mx-auto my-auto" Style="max-width: 600px;">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Minecraft Server Status</MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Refresh" OnClick="RefreshAsync" Disabled="_loading" />
+        </MudCardHeader>
+
+        <MudCardContent>
+            @if (_loading)
+            {
+                <MudStack Row Class="align-center" Spacing="2">
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Medium" />
+                    <MudText>Checking server...</MudText>
+                </MudStack>
+            }
+            else if (_error is not null)
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
+                    @_error
+                </MudAlert>
+            }
+            else if (_stat is not null && _stat.ServerUp)
+            {
+                <MudStack Spacing="2">
+                    <MudStack Row Class="align-center justify-space-between">
+                        <MudChip T="string" Color="Color.Success" Icon="@Icons.Material.Filled.CheckCircle">Online</MudChip>
+                        <MudText Typo="Typo.caption">Last updated: @_lastUpdated.ToLocalTime().ToString("T")</MudText>
+                    </MudStack>
+
+                    <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudPaper Class="pa-3">
+                                <MudText Typo="Typo.subtitle2">Players</MudText>
+                                <MudText Typo="Typo.h6">@_stat.CurrentPlayersInt / @_stat.MaximumPlayersInt</MudText>
+                                <MudProgressLinear Value="@PlayerPercent" Color="Color.Primary" />
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudPaper Class="pa-3">
+                                <MudText Typo="Typo.subtitle2">Version</MudText>
+                                <MudText Typo="Typo.h6">@_stat.Version</MudText>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudPaper Class="pa-3">
+                                <MudText Typo="Typo.subtitle2">MOTD</MudText>
+                                <MudText>@_stat.Motd</MudText>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudPaper Class="pa-3">
+                                <MudText Typo="Typo.subtitle2">Latency</MudText>
+                                <MudText Typo="Typo.h6">@_latencyMs ms</MudText>
+                            </MudPaper>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudPaper Class="pa-3">
+                                <MudText Typo="Typo.subtitle2">Address</MudText>
+                                <MudText>@Host</MudText>
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+                </MudStack>
+            }
+            else
+            {
+                <MudStack Spacing="2">
+                    <MudChip T="string" Color="Color.Error" Icon="@Icons.Material.Filled.Cancel">Offline</MudChip>
+                    <MudAlert Severity="Severity.Warning">
+                        Server is not reachable at @Host:@Port
+                    </MudAlert>
+                </MudStack>
+            }
+        </MudCardContent>
+
+        <MudCardActions>
+            <MudSwitch T="bool" @bind-Value="_autoRefresh" Color="Color.Primary" Label="Auto refresh" />
+            <MudTextField @bind-Value="_refreshSeconds" Label="Interval (s)" Variant="Variant.Outlined" Style="width: 140px;" />
+            <MudSpacer />
+            <MudButton OnClick="RefreshAsync" Variant="Variant.Outlined" Color="Color.Primary" Disabled="_loading">Refresh</MudButton>
+        </MudCardActions>
+    </MudCard>
+</div>
+
+@code {
+    [Parameter] public string Host { get; set; } = "example.com";
+    [Parameter] public ushort Port { get; set; } = 25565;
+    [Parameter] public int TimeoutMs { get; set; } = 3000;
+
+    private MineStat? _stat;
+    private bool _loading;
+    private string? _error;
+    private DateTime _lastUpdated;
+    private long _latencyMs;
+    private bool _autoRefresh = true;
+    private int _refreshSeconds = 30;
+    private Timer? _timer;
+
+    private double PlayerPercent =>
+        _stat is { MaximumPlayersInt: > 0 } ? (double)_stat.CurrentPlayersInt / _stat.MaximumPlayersInt * 100d : 0d;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
+        ResetTimer();
+    }
+
+    protected override void OnParametersSet()
+    {
+        ResetTimer();
+    }
+
+    private void ResetTimer()
+    {
+        _timer?.Dispose();
+        if (_autoRefresh && _refreshSeconds > 0)
+        {
+            _timer = new Timer(_ =>
+            {
+                InvokeAsync(RefreshAsync);
+            }, null, TimeSpan.FromSeconds(_refreshSeconds), TimeSpan.FromSeconds(_refreshSeconds));
+        }
+    }
+
+    private async Task RefreshAsync()
+    {
+        try
+        {
+            _loading = true;
+            _error = null;
+            _latencyMs = 0;
+            StateHasChanged();
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            _stat = await Task.Run(() => new MineStat(Host, Port));
+            sw.Stop();
+            _latencyMs = sw.ElapsedMilliseconds;
+
+            _lastUpdated = DateTime.UtcNow;
+        }
+        catch (Exception ex)
+        {
+            _error = $"Error fetching server status: {ex.Message}";
+            _stat = null;
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private bool _prevAutoRefresh;
+    private int _prevSeconds;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_prevAutoRefresh != _autoRefresh || _prevSeconds != _refreshSeconds)
+        {
+            _prevAutoRefresh = _autoRefresh;
+            _prevSeconds = _refreshSeconds;
+            ResetTimer();
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

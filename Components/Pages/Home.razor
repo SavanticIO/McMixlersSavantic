@@ -1,0 +1,44 @@
+﻿@page "/"
+@using MixlersSavantic.Components.UI
+
+<MudGrid Class="mt-4" GutterSize="3" Style="height: 100%;">
+    <MudItem xs="12" md="4">
+        <MinecraftServerStatus Host="mcmixlers.savantic.dev" Port="27501" TimeoutMs="3000" />
+    </MudItem>
+
+    <MudItem xs="12" md="8">
+        <MudCarousel Class="mud-width-full" Style="height: 1080px;" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+            <MudCarouselItem Transition="@Transition.Slide">
+                <div class="d-flex justify-center align-center" style="height:100%">
+                    <MudImage Fluid="true" Src="images/2025-09-26_19.19.26.png" Elevation="25" Class="rounded-lg" />
+                </div>
+            </MudCarouselItem>
+
+            <MudCarouselItem Transition="@Transition.Slide">
+                <div class="d-flex justify-center align-center" style="height:100%">
+                    <MudImage Fluid="true" Src="images/2025-09-26_19.21.43.png" Elevation="25" Class="rounded-lg" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="@Transition.Slide">
+                <div class="d-flex justify-center align-center" style="height:100%">
+                    <MudImage Fluid="true" Src="images/2025-09-26_19.22.12.png" Elevation="25" Class="rounded-lg" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="@Transition.Slide">
+                <div class="d-flex justify-center align-center" style="height:100%">
+                    <MudImage Fluid="true" Src="images/2025-09-26_19.23.26.png" Elevation="25" Class="rounded-lg" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="@Transition.Slide">
+                <div class="d-flex justify-center align-center" style="height:100%">
+                    <MudImage Fluid="true" Src="images/2025-09-26_19.23.41.png" Elevation="25" Class="rounded-lg" />
+                </div>
+            </MudCarouselItem>
+            <MudCarouselItem Transition="@Transition.Slide">
+                <div class="d-flex justify-center align-center" style="height:100%">
+                    <MudImage Fluid="true" Src="images/2025-09-26_19.24.12.png" Elevation="25" Class="rounded-lg" />
+                </div>
+            </MudCarouselItem>
+        </MudCarousel>
+    </MudItem>
+</MudGrid>
